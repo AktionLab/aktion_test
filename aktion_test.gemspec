@@ -18,10 +18,9 @@ Gem::Specification.new do |gem|
   # Don't add anything to this list that depends on Rails or any
   # other large frameworks/orms. This list should be suitable for
   # even the simplest gem.
-  gem.add_dependency 'rspec',        '~> 2.11.0'
-  gem.add_dependency 'cucumber',     '~> 1.2.1'
-  gem.add_dependency 'faker',        '~> 1.0.1'
-  gem.add_dependency 'factory_girl', '~> 4.0.0'
-  gem.add_dependency 'simplecov',    '~> 0.6.4'
-  gem.add_dependency 'timecop',      '~> 0.4.5'
+  gem.add_dependency 'rspec',        '~> 2.12.0'
+  gem.add_dependency 'faker',        '~> 1.1.2'
+  gem.add_dependency 'factory_girl', '~> 4.1.0'
+  gem.add_dependency 'simplecov',    '~> 0.7.1'
+  gem.add_dependency 'timecop',      '~> 0.5.3'
 end
