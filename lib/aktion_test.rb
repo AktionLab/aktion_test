@@ -1,5 +1,4 @@
 require "aktion_test/version"
+require "aktion_test/matchers/base"
+require "aktion_test/matchers/integrations/rspec"
 
-module AktionTest
-  # Your code goes here...
-end
