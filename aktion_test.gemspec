@@ -16,7 +16,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = AktionTest::VERSION
 
-  gem.require_ruby_version = '~> 1.9.2'
+  gem.required_ruby_version = '~> 1.9.2'
 
   # Don't add anything to this list that depends on Rails or any
   # other large frameworks/orms. This list should be suitable for
