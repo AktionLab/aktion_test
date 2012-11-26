@@ -1,6 +1,8 @@
 # AktionTest
 
-TODO: Write a gem description
+[![Build Status](https://secure.travis-ci.org/AktionLab/aktion_test.png?branch=master)](https://travis-ci.org/AktionLab/aktion_test)
+
+Testing gem that includes a common set of testing gem and a suite of RSpec Matchers
 
 ## Installation
 
