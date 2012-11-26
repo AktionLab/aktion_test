@@ -25,112 +25,172 @@ describe AktionTest::Matchers::FileSystem::DirectoryContentMatcher do
     @matcher ||= described_class.new(*args)
   end
 
-  context 'single file' do
-    context "within the directory" do
-      before(:each) { build(['test_file']) }
-
-      it "will be accepted if the file exists" do
-        test_root.should have_file('test_file')
-      end
-
-      it "will not be accepted if the file does not exist" do
-        test_root.should_not have_file('nxfile')
-      end
-
-      it "specifies the problem as the file not being found" do
-        matcher(['nxfile']).matches?(test_root)
-        matcher.failure_message.should == <<-FAIL.strip_heredoc.strip
-          Expected #{test_root} to contain:
-            nxfile
-
-          nxfile was not found
-        FAIL
-      end
+  context "single file in the root" do
+    it "will accept if the file exists" do
+      build(['test_file'])
+      test_root.should have_tree(['test_file'])
     end
 
-    context "within a subdirectory" do
-      before(:each) { build([{'a' => ['test_file']}]) }
+    it "will not accept if the file does not exist" do
+      test_root.should_not have_tree(['test_file'])
+    end
 
-      it "will be accepted if the file exists" do
-        test_root.should have_file('test_file')
-      end
-
-      it "will not be accepted if the file does not exist" do
-        test_root.should_not have_file('nxfile')
-      end
-
-      it "specifies the problem as the file not being found" do
-        matcher(['nxfile']).matches?(test_root)
-        matcher.failure_message.should == <<-FAIL.strip_heredoc.strip
-          Expected #{test_root} to contain:
-            nxfile
-
-          nxfile was not found
-        FAIL
-      end
+    it "will not accept if the file is in a subdirectory" do
+      build([{'a' => ['test_file']}])
+      test_root.should_not have_tree(['test_file'])
     end
   end
 
-  context 'multiple files' do
-    context 'within the directory' do
-      let(:files) { %w(a b c).map{|f| "test_file_#{f}"} }
-      before(:each) { build(files) }
-
-      it 'will be accepted if all of the files exist' do
-        test_root.should have_files(files)
-      end
-
-      it 'will not be accepeted if some of the files are missing' do
-        test_root.should_not have_files(files << 'nxfile')
-      end
-
-      it 'specifies the problem as the files that are missing' do
-        matcher(files + %w(nxfile_a nxfile_b)).matches?(test_root)
-        matcher.failure_message.should == <<-FAIL.strip_heredoc.strip
-          Expected #{test_root} to contain:
-            test_file_a
-            test_file_b
-            test_file_c
-            nxfile_a
-            nxfile_b
-
-          nxfile_a was not found
-          nxfile_b was not found
-        FAIL
-      end
+  context "single file in a specific directory" do
+    it "will accept if the file exists in the subdirectory" do
+      build([{'a' => ['test_file']}])
+      test_root.should have_tree([{'a' => ['test_file']}])
     end
 
-    context 'within subdirectories' do
-      let(:files) { %w(a b c).map{|f| "test_file_#{f}"} }
-      before(:each) do
-        build([
-          'a' => ['test_file_a'],
-          'b' => ['test_file_b', 'test_file_c']
-        ])
-      end
+    it "will not accept if the file does not exist" do
+      test_root.should_not have_tree([{'a' => ['test_file']}])
+    end
 
-      it 'will be accepted if all of the files exist' do
-        test_root.should have_files(files)
-      end
+    it "will not accept if the file exists in the root" do
+      build(['test_file'])
+      test_root.should_not have_tree([{'a' => ['test_file']}])
+    end
 
-      it 'will not be accepeted if any of the files are missing' do
-        test_root.should_not have_files(files << 'nxfile')
-      end
+    it "will not accept if the file exists in another directory" do
+      build([{'b' => ['test_file']}])
+      test_root.should_not have_tree([{'a' => ['test_file']}])
+    end
+  end
 
-      it 'specifies the problem as the files that are missing' do
-        matcher(files + %w(nxfile_a nxfile_b)).matches?(test_root)
-        matcher.failure_message.should == <<-FAIL.strip_heredoc.strip
-          Expected #{test_root} to contain:
+  context "single file in a specific tree" do
+    let(:tree) { [{'a' => [{'b' => [{'c' => ['test_file']}]}]}] }
+    it "will accept if the file exists in the tree" do
+      build(tree)
+      test_root.should have_tree(tree)
+    end
+  end
+
+  context "single file in any subdirectory" do
+    let(:tree) { [{'*' => ['test_file']}]}
+
+    it "will accept if the file exists in a subdirectory" do
+      build([{'a' => ['test_file']}])
+      test_root.should have_tree(tree)
+    end
+
+    it "will not accept if the file exists deeper in the tree" do
+      build([{'a' => [{'b' => ['test_file']}]}])
+      test_root.should_not have_tree(tree)
+    end
+  end
+
+  context "single file in any tree" do
+    let(:tree) { [{'**' => ['test_file']}]}
+
+    it "will accept if the file exists in the tree" do
+      build([{'a' => [{'b' => [{'c' => ['test_file']}]}]}])
+      test_root.should have_tree(tree)
+    end
+  end
+
+  context "single file with mixed specific and any directory" do
+    let(:tree) { [{'a' => [{'*' => [{'c' => ['test_file']}]}]}]}
+
+    it "will accept if the file exists in search path" do
+      build([{'a' => [{'b' => [{'c' => ['test_file']}]}]}])
+      test_root.should have_tree(tree)
+    end
+
+    it "will not accept if the file exists outside the search path" do
+      build([{
+        'a' => [{
+          'c' => ['test_file'],
+          'b' => [{
+            'd' => [{
+              'c' => ['test_file']
+              }]
+            }]
+          }]
+        }])
+      test_root.should_not have_tree(tree)
+    end
+  end
+
+  context "single file with mixed specific directories and any tree" do
+    let(:tree) { [{'a' => [{'**' => [{'d' => ['test_file']}]}]}]}
+
+    it "will accept if the file exists in the search path" do
+      build([{'a' => [{'b' => [{'c' => [{'d' => ['test_file']}]}]}]}])
+      test_root.should have_tree(tree)
+    end
+
+    it "will not accept if the file is outside the search path" do
+      build([{'a' => [{'b' => [{'c' => ['test_file']}]}]}])
+      test_root.should_not have_tree(tree)
+    end
+  end
+
+  context "multiple files in the root directory" do
+    let(:tree) { %w(test_file_a test_file_b) }
+
+    it "will accept if all of the files exist" do
+      build(%w(test_file_a test_file_b))
+      test_root.should have_tree(tree)
+    end
+
+    it "will not accept if not all of the files exist" do
+      build(['test_file_a'])
+      test_root.should_not have_tree(tree)
+    end
+  end
+
+  context "multiple files a subdirectory" do
+    let(:tree) { [{'a' => %w(test_file_a test_file_b)}]}
+
+    it "will accept if all of the files exist" do
+      build(tree)
+      test_root.should have_tree(tree)
+    end
+
+    it "will not accept if not all of the files exist" do
+      build([{'a' => %w(test_file_a)}])
+      test_root.should_not have_tree(tree)
+    end
+  end
+
+  context "multiple files in multiple subdirectories" do
+    let(:tree) { [{'a' => %w(test_file_a test_file_b), 'b' => %w(test_file_a test_file_b)}]}
+
+    it "will accept if all of the files exist" do
+      build(tree)
+      test_root.should have_tree(tree)
+    end
+
+    it "will not accept if not all of the files exist" do
+      build([{'a' => %w(test_file_a test_file_b), 'b' => %w(test_file_b)}])
+      test_root.should_not have_tree(tree)
+    end
+  end
+
+  context "when files do not exist" do
+    it "lists the missing files" do
+      #build([{'a' => ['test_file_a', {'b' => [{'c' => ['test_file_b', 'test_file_c']}]}]}])
+      build([{'a' => ['test_file_a']}])
+      matcher(['test_file', {'a' => ['test_file_a', {'b' => [{'c' => ['test_file_b', 'test_file_c']}]}]}]).matches?(test_root)
+      matcher.failure_message.should == <<-FAIL.strip_heredoc.strip
+        Expected #{test_root} to contain:
+          test_file
+          a/
             test_file_a
-            test_file_b
-            test_file_c
-            nxfile_a
-            nxfile_b
+            b/
+              c/
+                test_file_b
+                test_file_c
 
-          nxfile_a was not found
-          nxfile_b was not found
-        FAIL
-      end
+        test_file was not found
+        a/b/c/test_file_b was not found
+        a/b/c/test_file_c was not found
+      FAIL
     end
   end
 

@@ -1,32 +1,53 @@
 module AktionTest
   module Matchers
     module FileSystem
-      def have_file(file)
-        DirectoryContentMatcher.new([file])
+      def have_file(path)
+        # 'some_file' : ['some_file']
+        # 'some_dir/some_file' : [{'some_dir' => ['some_file']}]
+        # '*/some_file' : [{'*' => ['some_file']}]
+        # '**/some_file' : [{'**' => ['some_file']}]
+        # 'some_dir/*/some_file' :
+        segments = path.split('/')
+        file = segments.pop
+        tree = segments.reverse.reduce([file]) {|a,b| [{b => a}] }
+        have_tree(tree)
       end
 
       def have_files(files)
+        # have_tree([{'**' => files}])
         DirectoryContentMatcher.new(files)
       end
 
+      def have_directory(dir)
+        # have_tree([{'**' => [{dir => []}]}])
+      end
+
+      def have_directories(dirs)
+        # have_tree([{'**' => [Hash[a.zip(a.size.times.map{[]})]]}])
+      end
+
+      def have_tree(tree)
+        DirectoryContentMatcher.new(tree)
+      end
+
       class DirectoryContentMatcher < Matchers::Base
-        def initialize(structure, options={})
-          @structure, @options = structure, options
+        def initialize(tree)
+          @tree = tree
         end
 
         def matches?(subject)
           @subject = subject
-          directory_exists? && @structure.none? {|f| find(f).empty?}
+          directory_exists? && matches_tree?(@tree)
         end
 
       protected
 
-        def find(file_or_dir, dir=@subject)
-          Dir.entries(dir).reject{|e| %w(. ..).include? e}.select do |e|
-            if File.directory?(File.join(dir, e))
-              find(file, File.join(dir, e)).any?
-            else
-              file == e
+        def matches_tree?(tree, directory='')
+          tree.all? do |entry|
+            if entry.is_a? String
+              Dir[File.join(@subject, directory, entry)].any?
+            elsif entry.is_a? Hash
+              entry.to_a.all?{|dir,subtree| matches_tree?(subtree, File.join(directory, dir))}
             end
           end
         end
@@ -36,7 +57,18 @@ module AktionTest
         end
 
         def expectation
-          "#{@subject} to contain:\n#{print_structure}\n"
+          "#{@subject} to contain:\n#{print_tree}\n"
+        end
+
+        def flatten_tree(structure, directory='')
+          structure.map do |entry|
+            case entry
+            when Hash
+              entry.map{|dir,entries| flatten_tree(entries, "#{directory}#{dir}/")}
+            when String
+              "#{directory}#{entry}"
+            end
+          end.flatten
         end
 
         def problem
@@ -47,7 +79,9 @@ module AktionTest
               "#{@subject} does not exist."
             end
           else
-            missing_files = @structure.select{|entry| find(entry).empty?}
+            missing_files = flatten_tree(@tree).reject do |path|
+              Dir["#{@subject}/#{path}"].any?
+            end
             if missing_files.any?
               missing_files.map{|f| "#{f} was not found"}.join("\n")
             else
@@ -56,16 +90,16 @@ module AktionTest
           end
         end
 
-        def print_structure(structure=nil, depth=1)
-          structure ||= @structure
-          structure.map do |entry|
+        def print_tree(tree=nil, depth=1)
+          tree ||= @tree
+          tree.map do |entry|
             case entry
             when String then
               print_file(entry, depth)
             when Hash
               entry.map do |k,v|
-                print_directory(k, depth)
-                print_structure(v, depth + 1)
+                print_directory(k, depth) + "\n" +
+                print_tree(v, depth + 1)
               end.join("\n")
             end
           end.join("\n")
@@ -76,7 +110,7 @@ module AktionTest
         end
 
         def print_directory(directory, depth)
-          print_file(directory << '/')
+          print_file(directory + '/', depth)
         end
       end
     end
