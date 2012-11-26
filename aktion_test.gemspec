@@ -7,6 +7,7 @@ Gem::Specification.new do |gem|
   gem.description   = %q{Contains all required testing gems as well as some rake tasks and test helpers to make getting a test suite up and running easy and fast.}
   gem.summary       = %q{Gems, libs, helpers for test suites.}
   gem.homepage      = "http://aktionlab.com"
+  gem.license       = 'MIT'
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
@@ -14,6 +15,8 @@ Gem::Specification.new do |gem|
   gem.name          = "aktion_test"
   gem.require_paths = ["lib"]
   gem.version       = AktionTest::VERSION
+
+  gem.require_ruby_version = '~> 1.9.2'
 
   # Don't add anything to this list that depends on Rails or any
   # other large frameworks/orms. This list should be suitable for
