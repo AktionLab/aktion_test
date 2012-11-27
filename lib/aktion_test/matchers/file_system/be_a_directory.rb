@@ -21,7 +21,15 @@ module AktionTest
         end
 
         def problem
-          ""
+          if File.exists? @subject
+            unless File.directory? @subject
+              "#{@subject} is not a directory."
+            else
+              "Unknown"
+            end
+          else
+            "#{@subject} does not exist."
+          end
         end
 
         def directory_exists?
