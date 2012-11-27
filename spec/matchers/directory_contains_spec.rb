@@ -25,6 +25,30 @@ describe AktionTest::Matchers::FileSystem::DirectoryContentMatcher do
     @matcher ||= described_class.new(*args)
   end
 
+  context "with a matching tree" do
+    it "provides a negative failure message" do
+      build(['test_file'])
+      matcher = described_class.new(['test_file'])
+      matcher.matches?(test_root)
+      matcher.negative_failure_message.should == <<-MSG.strip_heredoc
+        Did not expect #{test_root} to contain:
+          test_file
+      MSG
+    end
+
+    it "provides a failure message with an unknown problem" do
+      build(['test_file'])
+      matcher = described_class.new(['test_file'])
+      matcher.matches?(test_root)
+      matcher.failure_message.should == <<-MSG.strip_heredoc.strip
+        Expected #{test_root} to contain:
+          test_file
+
+        Unknown Problem
+      MSG
+    end
+  end
+
   context "single file in the root" do
     it "will accept if the file exists" do
       build(['test_file'])

@@ -2,28 +2,10 @@ module AktionTest
   module Matchers
     module FileSystem
       def have_file(path)
-        # 'some_file' : ['some_file']
-        # 'some_dir/some_file' : [{'some_dir' => ['some_file']}]
-        # '*/some_file' : [{'*' => ['some_file']}]
-        # '**/some_file' : [{'**' => ['some_file']}]
-        # 'some_dir/*/some_file' :
         segments = path.split('/')
         file = segments.pop
         tree = segments.reverse.reduce([file]) {|a,b| [{b => a}] }
         have_tree(tree)
-      end
-
-      def have_files(files)
-        # have_tree([{'**' => files}])
-        DirectoryContentMatcher.new(files)
-      end
-
-      def have_directory(dir)
-        # have_tree([{'**' => [{dir => []}]}])
-      end
-
-      def have_directories(dirs)
-        # have_tree([{'**' => [Hash[a.zip(a.size.times.map{[]})]]}])
       end
 
       def have_tree(tree)
