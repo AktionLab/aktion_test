@@ -2,6 +2,8 @@ require 'simplecov'
 
 SimpleCov.start do
   add_filter '/spec/'
+  refuse_coverage_drop
+  minimum_coverage 100
 end
 
 require 'aktion_test'
