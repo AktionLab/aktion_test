@@ -1,3 +1,9 @@
+# v0.1.1
+
+  * Add ClassBuilder to create classes on the fly
+  * Improve some specs
+  * Add SimpleCov with strict 100% coverage
+
 # v0.1.0
 
 Addition of RSpec matchers
