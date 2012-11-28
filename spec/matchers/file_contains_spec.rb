@@ -1,0 +1,93 @@
+require 'spec_helper'
+
+describe AktionTest::Matchers::FileSystem::FileContentMatcher do
+  def create_file(file='tmp/test_file', &block)
+    FileUtils.mkdir('tmp') unless Dir.exists? 'tmp'
+    File.open(file, 'w') {|f| f << yield }
+  end
+
+  after(:each) do
+    Dir['tmp/*'].each {|f| FileUtils.rm f}
+  end
+
+  context 'a file that does not exist' do
+    it "will not be accepted" do
+      'tmp/test_file'.should_not match_lines(['anything'])
+    end
+  end
+
+  context 'a file that exists' do
+    before(:each) do
+      create_file do
+        <<-FILE.strip_heredoc
+          lorem
+          ipsum
+          dolar
+          amet
+        FILE
+      end
+    end
+
+    context 'with all matching content' do
+      it 'will be accpeted' do
+        'tmp/test_file'.should match_lines(['lorem'])
+      end
+
+      it 'will be accepted with a regex' do
+        'tmp/test_file'.should match_lines([/^ips/])
+      end
+    end
+
+    context 'with no matching content after a specified point' do
+      it 'will not be accepted' do
+        'tmp/test_file'.should_not match_lines(['lorem'], :after => 'ipsum')
+        'tmp/test_file'.should_not match_lines(['lorem']).after('ipsum')
+        'tmp/test_file'.should_not match_lines(['lorem'], :after => /sum$/)
+        'tmp/test_file'.should_not match_lines(['lorem']).after(/sum$/)
+      end
+    end
+
+    context 'with matching content after a specified point' do
+      it 'will be accepted' do
+        'tmp/test_file'.should match_lines(['dolar','amet']).after('ipsum')
+      end
+    end
+
+    context 'with no matching content before a specified point' do
+      it 'will not be accepted' do
+        'tmp/test_file'.should_not match_lines(['amet'], :before => 'dolar')
+        'tmp/test_file'.should_not match_lines(['amet'], :before => /^dol/)
+        'tmp/test_file'.should_not match_lines(['amet']).before('dolar')
+        'tmp/test_file'.should_not match_lines(['amet']).before(/^dol/)
+      end
+    end
+
+    context 'with matching content before a specified point' do
+      it 'will be accepted' do
+        'tmp/test_file'.should match_lines(['lorem','ipsum']).before('dolar')
+      end
+    end
+
+    context 'without any matching content' do
+      it 'will not be accepted' do
+        'tmp/test_file'.should_not match_lines(['nothing'])
+      end
+    end
+
+    context 'with partial matching content' do
+      context 'when matching all lines (default)' do
+        it 'will not be accepted' do
+          'tmp/test_file'.should_not match_lines(['some','thing'])
+        end
+      end
+
+      context 'when matching any lines' do
+        it 'will be accepted' do
+          'tmp/test_file'.should match_lines(['lorem','dolar'], allow_any: true)
+          'tmp/test_file'.should match_lines(['lorem','dolor']).allow_any
+        end
+      end
+    end
+  end
+end
+
