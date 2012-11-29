@@ -6,6 +6,7 @@ SimpleCov.start do
   minimum_coverage 100
 end
 
+require 'active_support/core_ext/string'
 require 'aktion_test'
 
 RSpec.configure do |config|
