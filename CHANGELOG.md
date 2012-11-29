@@ -1,3 +1,6 @@
+# v0.1.2
+  * Add a file contents matcher
+
 # v0.1.1
 
   * Add ClassBuilder to create classes on the fly
