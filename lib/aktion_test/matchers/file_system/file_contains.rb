@@ -8,8 +8,10 @@ module AktionTest
       class FileContentMatcher < Matchers::Base
         def initialize(lines, options={})
           @lines, @options = init_lines(lines), options
-          @options[:match_method] = (@options.delete(:allow_any) ? :any? : :all?)
-          @options[:after] = regexp(@options[:after]) unless @options[:after].nil?
+          @options[:match_method] = :all
+          allow_any    if @options.delete(:allow_any)
+          sequentially if @options.delete(:sequentially)
+          @options[:after]  = regexp(@options[:after])  unless @options[:after].nil?
           @options[:before] = regexp(@options[:before]) unless @options[:before].nil?
         end
 
@@ -23,7 +25,7 @@ module AktionTest
         end
       
         def allow_any
-          @options[:match_method] = :any?
+          @options[:match_method] = :any
           self
         end
 
@@ -38,7 +40,7 @@ module AktionTest
         end
 
         def sequentially
-          @options[:sequentially] = true
+          @options[:match_method] = :sequence
           self
         end
 
@@ -57,21 +59,22 @@ module AktionTest
         end
 
         def file_has_contents?
-          scope = -> lines, match, default { lines.find_index{|line| line =~ @options[match]} || default }
+          find  = -> lines, match { lines.find_index{|line| line =~ match} }
+          scope = -> lines, scope, default { find[lines, @options[scope]] || default }
           lines = -> lines { lines.take(scope[lines, :before, lines.count]).drop(scope[lines, :after, -1] + 1) }
 
-          scoped_lines = lines[open(@file).readlines]
 
-          if @options[:sequentially]
-            result = @lines.map do |line|
-              scoped_lines.find_index{|fline| line =~ fline}
-            end
-            return false if result.first.nil?
-            result == ((result.first)..(result.first + @lines.count - 1)).to_a
-          else
-            @lines.send(@options[:match_method]) do |line|
-              scoped_lines.any? {|fl| fl =~ line}
-            end
+          match_method[@lines.map{|line| find[lines[open(@file).readlines], line]}]
+        end
+
+        def match_method
+          case @options[:match_method]
+          when :sequence
+            -> result { !result.first.nil? && (result == ((result.first)..(result.first + @lines.count - 1)).to_a) }
+          when :any
+            -> result { !result.all?(&:nil?) }
+          when :all
+            -> result { result.none?(&:nil?) }
           end
         end
 
