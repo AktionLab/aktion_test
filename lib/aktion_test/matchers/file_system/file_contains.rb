@@ -7,6 +7,7 @@ module AktionTest
 
       class FileContentMatcher < Matchers::Base
         def initialize(lines, options={})
+          @original_lines = lines
           @lines, @options = init_lines(lines), options
           @options[:match_method] = :all
           allow_any    if @options.delete(:allow_any)
@@ -47,15 +48,27 @@ module AktionTest
       protected
         
         def expectation
-          "#{@file} to have contents:\n#{@lines}"
+          "#{@file} to have contents:\n---\n#{print_lines}\n---"
+        end
+
+        def print_lines
+          @original_lines.join("\n")
         end
 
         def problem
-          ""
+          if File.exists?(@file)
+            if File.directory?(@file)
+              "#{@file} is a directory."
+            else
+              "Unknown Problem"
+            end
+          else
+            "#{@file} does not exist."
+          end
         end
 
         def file_exists?
-          File.exists? @file
+          File.exists?(@file) && !File.directory?(@file)
         end
 
         def file_has_contents?

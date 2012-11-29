@@ -14,6 +14,36 @@ describe AktionTest::Matchers::FileSystem::FileContentMatcher do
     it "will not be accepted" do
       'tmp/test_file'.should_not match_lines(['anything'])
     end
+
+    it 'explains that the file was not found' do
+      matcher = described_class.new(['anything'])
+      matcher.matches?('tmp/test_file')
+      matcher.failure_message.should == <<-MSG.strip_heredoc.strip
+        Expected tmp/test_file to have contents:
+        ---
+        anything
+        ---
+        tmp/test_file does not exist.
+      MSG
+    end
+  end
+
+  context 'a file that is actually a directory' do
+    it 'will not be accepted' do
+      File.dirname(__FILE__).should_not match_lines(['anything'])
+    end
+
+    it 'explains that the file is a directory' do
+      matcher = described_class.new(['anything'])
+      matcher.matches?(File.dirname(__FILE__))
+      matcher.failure_message.should == <<-MSG.strip_heredoc.strip
+        Expected #{File.dirname(__FILE__)} to have contents:
+        ---
+        anything
+        ---
+        #{File.dirname(__FILE__)} is a directory.
+      MSG
+    end
   end
 
   context 'a file that exists' do
