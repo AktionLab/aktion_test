@@ -7,10 +7,14 @@ module AktionTest
 
       class FileContentMatcher < Matchers::Base
         def initialize(lines, options={})
-          @lines, @options = lines, options
+          @lines, @options = init_lines(lines), options
           @options[:match_method] = (@options.delete(:allow_any) ? :any? : :all?)
-          @options[:after] ||= nil
-          @options[:before] ||= nil
+          @options[:after] = regexp(@options[:after]) unless @options[:after].nil?
+          @options[:before] = regexp(@options[:before]) unless @options[:before].nil?
+        end
+
+        def init_lines(lines)
+          lines.map { |line| regexp(line) }.flatten
         end
 
         def matches?(file)
@@ -24,12 +28,17 @@ module AktionTest
         end
 
         def after(match_after)
-          @options[:after] = match_after
+          @options[:after] = regexp(match_after)
           self
         end
 
         def before(match_before)
-          @options[:before] = match_before
+          @options[:before] = regexp(match_before)
+          self
+        end
+
+        def sequentially
+          @options[:sequentially] = true
           self
         end
 
@@ -48,36 +57,36 @@ module AktionTest
         end
 
         def file_has_contents?
-          file_lines = File.open(@file, 'r').read.split("\n")
-          if @options[:after]
-            file_lines = file_lines.drop_while do |line|
-              case @options[:after]
-              when String
-                line != @options[:after]
-              when Regexp
-                !(line =~ @options[:after])
-              end
+          scope = -> lines, match, default { lines.find_index{|line| line =~ @options[match]} || default }
+          lines = -> lines { lines.take(scope[lines, :before, lines.count]).drop(scope[lines, :after, -1] + 1) }
+
+          scoped_lines = lines[open(@file).readlines]
+
+          if @options[:sequentially]
+            result = @lines.map do |line|
+              scoped_lines.find_index{|fline| line =~ fline}
+            end
+            return false if result.first.nil?
+            result == ((result.first)..(result.first + @lines.count - 1)).to_a
+          else
+            @lines.send(@options[:match_method]) do |line|
+              scoped_lines.any? {|fl| fl =~ line}
             end
           end
+        end
 
-          if @options[:before]
-            file_lines = file_lines.take_while do |line|
-              case @options[:before]
-              when String
-                line != @options[:before]
-              when Regexp
-                !(line =~ @options[:before])
-              end
+        def regexp(object)
+          case object
+          when Regexp then object
+          when Array  then object.map {|item| regexp(item)} 
+          when String
+            if object.include? "\n"
+              object.split("\n").map{|item| %r(^#{item}$)}
+            else
+              %r(^#{object}$)
             end
-          end
-
-          @lines.send(@options[:match_method]) do |line|
-            case line
-            when String
-              file_lines.include? line
-            when Regexp
-              file_lines.any? {|fl| fl =~ line}
-            end
+          else
+            %r(^#{object.to_s}$)
           end
         end
       end

@@ -36,6 +36,16 @@ describe AktionTest::Matchers::FileSystem::FileContentMatcher do
       it 'will be accepted with a regex' do
         'tmp/test_file'.should match_lines([/^ips/])
       end
+
+      it 'will be accepted with a multiline match' do
+        match_content = <<-MATCH.strip_heredoc.strip
+          lorem
+          ipsum
+          dolar
+          amet
+        MATCH
+        'tmp/test_file'.should match_lines([match_content])
+      end
     end
 
     context 'with no matching content after a specified point' do
@@ -51,6 +61,12 @@ describe AktionTest::Matchers::FileSystem::FileContentMatcher do
       it 'will be accepted' do
         'tmp/test_file'.should match_lines(['dolar','amet']).after('ipsum')
       end
+
+      context 'when the matching content includes the point' do
+        it 'will not be accepted' do
+          'tmp/test_file'.should_not match_lines(['dolar','amet']).after('dolar')
+        end
+      end
     end
 
     context 'with no matching content before a specified point' do
@@ -65,6 +81,43 @@ describe AktionTest::Matchers::FileSystem::FileContentMatcher do
     context 'with matching content before a specified point' do
       it 'will be accepted' do
         'tmp/test_file'.should match_lines(['lorem','ipsum']).before('dolar')
+      end
+
+      context 'when the matching content includes the point' do
+        it 'will not be accepted' do
+          'tmp/test_file'.should_not match_lines(['lorem','ipsum']).before('ipsum')
+        end
+      end
+    end
+
+    context 'with matching content before and after specified points' do
+      it 'will be accpeted' do
+        'tmp/test_file'.should match_lines(['dolar']).before('amet').after('ipsum')
+      end
+    end
+
+    context 'without matching content in order' do
+      it 'will not be accepted' do
+        'tmp/test_file'.should_not match_lines(['lorem','dolar'], :sequentially => true)
+        'tmp/test_file'.should_not match_lines(['lorem','dolar']).sequentially
+      end
+    end
+
+    context 'with matching content in order' do
+      it 'will be accepted' do
+        'tmp/test_file'.should match_lines(%w(ipsum dolar amet)).sequentially
+      end
+    end
+
+    context 'with no matching content in order after a specified point' do
+      it 'will not be accepted' do
+        'tmp/test_file'.should_not match_lines(%w(lorem ipsum dolar)).sequentially.after('ipsum')
+      end
+    end
+
+    context 'with no matching content in order before a specified point' do
+      it 'will not be accepted' do
+        'tmp/test_file'.should_not match_lines(%w(ipsum dolar amet)).sequentially.before('dolar')
       end
     end
 
