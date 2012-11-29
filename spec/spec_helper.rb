@@ -3,7 +3,7 @@ require 'simplecov'
 SimpleCov.start do
   add_filter '/spec/'
   refuse_coverage_drop
-  minimum_coverage 100
+  minimum_coverage 95
 end
 
 require 'active_support/core_ext/string'
