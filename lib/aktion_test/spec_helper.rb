@@ -14,7 +14,9 @@ module AktionTest
           load_constants(names)
 
           unless options.nil? || options.empty?
-            instance.options.merge! options
+            names.each do |name|
+              instance.options.merge! name => options
+            end
           end
 
           instance.modules.each do |mod|
@@ -25,14 +27,8 @@ module AktionTest
         self.instance_eval(&block) if block_given?
       end
 
-      def load_module(name, options={})
-        unless options.nil? or options.empty?
-          self.load(name, name => options)
-        end
-      end
-
       def within(scope, &block)
-        instance.scope << scope
+        instance.scope << scope.to_s
         yield
         instance.scope.pop
       end
@@ -53,6 +49,10 @@ module AktionTest
     end
 
     def initialize
+      reset
+    end
+
+    def reset
       @modules = []
       @options = {}
       @scope   = %w(AktionTest Module)
