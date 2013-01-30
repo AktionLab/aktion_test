@@ -18,12 +18,11 @@ module AktionTest
             @tree = tree
           end
 
-          def matches?(subject)
-            @subject = subject
+        protected
+          
+          def perform_match!
             directory_exists? && matches_tree?(@tree)
           end
-
-        protected
 
           def matches_tree?(tree, directory='')
             tree.all? do |entry|
@@ -54,7 +53,7 @@ module AktionTest
             end.flatten
           end
 
-          def problem
+          def problems_for_should
             unless directory_exists?
               if File.exists? @subject
                 "#{@subject} is not a directory."
@@ -71,6 +70,9 @@ module AktionTest
                 "Unknown Problem"
               end
             end
+          end
+
+          def problems_for_should_not
           end
 
           def print_tree(tree=nil, depth=1)

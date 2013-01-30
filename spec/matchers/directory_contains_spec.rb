@@ -33,18 +33,8 @@ describe AktionTest::Matchers::FileSystem::DirectoryContains::Matcher do
       matcher.negative_failure_message.should == <<-MSG.strip_heredoc
         Did not expect #{test_root} to contain:
           test_file
-      MSG
-    end
 
-    it "provides a failure message with an unknown problem" do
-      build(['test_file'])
-      matcher = described_class.new(['test_file'])
-      matcher.matches?(test_root)
-      matcher.failure_message.should == <<-MSG.strip_heredoc.strip
-        Expected #{test_root} to contain:
-          test_file
 
-        Unknown Problem
       MSG
     end
   end
@@ -201,7 +191,7 @@ describe AktionTest::Matchers::FileSystem::DirectoryContains::Matcher do
       #build([{'a' => ['test_file_a', {'b' => [{'c' => ['test_file_b', 'test_file_c']}]}]}])
       build([{'a' => ['test_file_a']}])
       matcher(['test_file', {'a' => ['test_file_a', {'b' => [{'c' => ['test_file_b', 'test_file_c']}]}]}]).matches?(test_root)
-      matcher.failure_message.should == <<-FAIL.strip_heredoc.strip
+      matcher.failure_message.should == <<-FAIL.strip_heredoc
         Expected #{test_root} to contain:
           test_file
           a/
@@ -227,7 +217,7 @@ describe AktionTest::Matchers::FileSystem::DirectoryContains::Matcher do
 
     it "specifies the problem as the subject not existing" do
       matcher(['some_file']).matches?(nx_root)
-      matcher.failure_message.should == <<-FAIL.strip_heredoc.strip
+      matcher.failure_message.should == <<-FAIL.strip_heredoc
         Expected #{nx_root} to contain:
           some_file
 
@@ -246,7 +236,7 @@ describe AktionTest::Matchers::FileSystem::DirectoryContains::Matcher do
     it "specifies the problem as the subject not being a directory" do
       bad_root = File.join(test_root, 'test_file')
       matcher(['some_file']).matches?(bad_root)
-      matcher.failure_message.should == <<-FAIL.strip_heredoc.strip
+      matcher.failure_message.should == <<-FAIL.strip_heredoc
         Expected #{bad_root} to contain:
           some_file
 
