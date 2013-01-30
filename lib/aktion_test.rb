@@ -1,7 +1,15 @@
 require 'active_support/dependencies'
+require 'active_support/core_ext'
 
-require "aktion_test/version"
-require "aktion_test/matchers/base"
-require 'aktion_test/class_builder'
-require "aktion_test/matchers/integrations/rspec"
+module AktionTest
+  extend ActiveSupport::Autoload
 
+  autoload :SpecHelper
+
+  module Module
+    extend ActiveSupport::Autoload
+
+    autoload :Simplecov
+    autoload :RSpec
+  end
+end
