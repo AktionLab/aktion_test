@@ -1,5 +1,3 @@
-require 'active_support/dependencies'
-
 module AktionTest
   module ClassBuilder
     def self.included(example_group)

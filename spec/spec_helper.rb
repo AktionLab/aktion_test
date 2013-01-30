@@ -1,3 +1,3 @@
 require 'aktion_test'
 
-AktionTest::SpecHelper.load :simplecov, :rspec
+AktionTest::SpecHelper.load :Simplecov, :RSpec, :AktionTest

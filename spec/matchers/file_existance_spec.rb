@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe AktionTest::Matchers::FileSystem::FileExistanceMatcher do
+describe AktionTest::Matchers::FileSystem::FileExistance::Matcher do
   context "an existing file" do
     let(:file) { __FILE__ }
 

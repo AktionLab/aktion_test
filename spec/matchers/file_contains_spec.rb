@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe AktionTest::Matchers::FileSystem::FileContentMatcher do
+describe AktionTest::Matchers::FileSystem::FileContains::Matcher do
   def create_file(file='tmp/test_file', &block)
     FileUtils.mkdir('tmp') unless Dir.exists? 'tmp'
     File.open(file, 'w') {|f| f << yield }

@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'active_support/core_ext/string'
 
-describe AktionTest::Matchers::FileSystem::DirectoryContentMatcher do
+describe AktionTest::Matchers::FileSystem::DirectoryContains::Matcher do
   let(:test_root) { File.expand_path(File.join(__FILE__, '..', '..', 'tmp')) }
 
   before(:each) do

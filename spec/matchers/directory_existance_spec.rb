@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe AktionTest::Matchers::FileSystem::DirectoryExistanceMatcher do
+describe AktionTest::Matchers::FileSystem::DirectoryExistance::Matcher do
   context "an existing directory" do
     let(:dir) { File.expand_path(File.join(__FILE__, '..')) }
 

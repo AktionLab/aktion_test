@@ -1,3 +1,4 @@
+require "aktion_test/version"
 require 'active_support/dependencies'
 require 'active_support/core_ext'
 
@@ -9,7 +10,8 @@ module AktionTest
   module Module
     extend ActiveSupport::Autoload
 
+    autoload :AktionTest
+    autoload :RSpec, 'aktion_test/module/rspec'
     autoload :Simplecov
-    autoload :RSpec
   end
 end
