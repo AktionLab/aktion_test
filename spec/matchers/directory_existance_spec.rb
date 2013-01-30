@@ -11,17 +11,9 @@ describe AktionTest::Matchers::FileSystem::DirectoryExistance::Matcher do
     it "provides a negative failure message" do
       matcher = described_class.new
       matcher.matches?(dir)
-      matcher.negative_failure_message.should == <<-MSG.strip_heredoc.strip
+      matcher.negative_failure_message.should == <<-MSG.strip_heredoc
         Did not expect #{dir} to be a directory.
-      MSG
-    end
 
-    it "provides a failure message with an unknown problem" do
-      matcher = described_class.new
-      matcher.matches?(dir)
-      matcher.failure_message.should == <<-MSG.strip_heredoc.strip
-        Expected #{dir} to be a directory.
-        Unknown
       MSG
     end
   end
@@ -36,7 +28,7 @@ describe AktionTest::Matchers::FileSystem::DirectoryExistance::Matcher do
     it "explains that the subject does not exist" do
       matcher = described_class.new
       matcher.matches?(dir)
-      matcher.failure_message.should == <<-MSG.strip_heredoc.strip
+      matcher.failure_message.should == <<-MSG.strip_heredoc
         Expected #{dir} to be a directory.
         #{dir} does not exist.
       MSG
@@ -53,7 +45,7 @@ describe AktionTest::Matchers::FileSystem::DirectoryExistance::Matcher do
     it "explains that the subject is a file" do
       matcher = described_class.new
       matcher.matches?(dir)
-      matcher.failure_message.should == <<-MSG.strip_heredoc.strip
+      matcher.failure_message.should == <<-MSG.strip_heredoc
         Expected #{dir} to be a directory.
         #{dir} is not a directory.
       MSG
