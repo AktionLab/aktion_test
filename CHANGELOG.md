@@ -1,3 +1,7 @@
+# v0.2.1
+  * Improve spec helper
+  * Add FactoryGirl, Faker and Timecop
+
 # v0.2.0
   * Build out a better base matcher class
   * Implement a SpecHelper loading interface
