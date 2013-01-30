@@ -23,7 +23,7 @@ Gem::Specification.new do |gem|
   # even the simplest gem.
   gem.add_dependency 'rspec',        '~> 2.12.0'
   gem.add_dependency 'faker',        '~> 1.1.2'
-  gem.add_dependency 'factory_girl', '~> 4.1.0'
+  gem.add_dependency 'factory_girl', '~> 4.2.0'
   gem.add_dependency 'simplecov',    '~> 0.7.1'
   gem.add_dependency 'timecop',      '~> 0.5.3'
 end
