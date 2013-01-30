@@ -18,7 +18,7 @@ describe AktionTest::Matchers::FileSystem::FileContains::Matcher do
     it 'explains that the file was not found' do
       matcher = described_class.new(['anything'])
       matcher.matches?('tmp/test_file')
-      matcher.failure_message.should == <<-MSG.strip_heredoc.strip
+      matcher.failure_message.should == <<-MSG.strip_heredoc
         Expected tmp/test_file to have contents:
         ---
         anything
@@ -36,7 +36,7 @@ describe AktionTest::Matchers::FileSystem::FileContains::Matcher do
     it 'explains that the file is a directory' do
       matcher = described_class.new(['anything'])
       matcher.matches?(File.dirname(__FILE__))
-      matcher.failure_message.should == <<-MSG.strip_heredoc.strip
+      matcher.failure_message.should == <<-MSG.strip_heredoc
         Expected #{File.dirname(__FILE__)} to have contents:
         ---
         anything

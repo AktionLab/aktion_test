@@ -21,11 +21,6 @@ module AktionTest
             lines.map { |line| regexp(line) }.flatten
           end
 
-          def matches?(file)
-            @file = file
-            file_exists? && file_has_contents?
-          end
-        
           def allow_any
             @options[:match_method] = :any
             self
@@ -49,27 +44,31 @@ module AktionTest
         protected
           
           def expectation
-            "#{@file} to have contents:\n---\n#{print_lines}\n---"
+            "#{@subject} to have contents:\n---\n#{print_lines}\n---"
+          end
+
+          def perform_match!
+            file_exists? && file_has_contents?
           end
 
           def print_lines
             @original_lines.join("\n")
           end
 
-          def problem
-            if File.exists?(@file)
-              if File.directory?(@file)
-                "#{@file} is a directory."
+          def problems_for_should
+            if File.exists?(@subject)
+              if File.directory?(@subject)
+                "#{@subject} is a directory."
               else
                 "Unknown Problem"
               end
             else
-              "#{@file} does not exist."
+              "#{@subject} does not exist."
             end
           end
 
           def file_exists?
-            File.exists?(@file) && !File.directory?(@file)
+            File.exists?(@subject) && !File.directory?(@subject)
           end
 
           def file_has_contents?
@@ -78,7 +77,7 @@ module AktionTest
             lines = -> lines { lines.take(scope[lines, :before, lines.count]).drop(scope[lines, :after, -1] + 1) }
 
 
-            match_method[@lines.map{|line| find[lines[open(@file).readlines], line]}]
+            match_method[@lines.map{|line| find[lines[open(@subject).readlines], line]}]
           end
 
           def match_method
