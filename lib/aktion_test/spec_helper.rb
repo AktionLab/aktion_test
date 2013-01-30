@@ -8,43 +8,20 @@ module AktionTest
 
     class << self
       def load(*names, &block)
-        options = names.extract_options!
-
         if names.any?
-          load_constants(names)
-
-          unless options.nil? || options.empty?
-            names.each do |name|
-              instance.options.merge! name => options
-            end
-          end
-
-          instance.modules.each do |mod|
-            include mod
-          end
+          instance.load(*names)
         end
 
-        self.instance_eval(&block) if block_given?
+        instance.instance_eval(&block) if block_given?
+
+        instance.modules.each{|mod| include mod}
       end
 
-      def within(scope, &block)
-        instance.scope << scope.to_s
-        yield
-        instance.scope.pop
+      def add_module(name, options={})
       end
 
-    private
-
-      def load_constants(modules)
-        modules.each do |mod|
-          module_name = "#{instance.scope.join('::')}::#{mod}"
-          begin
-            module_const = module_name.constantize
-            instance.modules << module_const
-          rescue NameError
-            puts "Unknown module #{mod}."
-          end
-        end
+      def add_modules(*names)
+        names.each{|name| add_module(name)}
       end
     end
 
@@ -60,6 +37,35 @@ module AktionTest
 
     def loaded?(name)
       eval "defined? AktionTest::Module::#{name}"
+    end
+
+    def load(*names)
+      options = names.extract_options!
+
+      names.each do |name|
+        unless options.nil? or options.empty?
+          self.options.merge! name => options
+        end
+        load_constant(name)
+      end
+    end
+
+    def within(scope, &block)
+      self.scope << scope.to_s
+      yield
+      self.scope.pop
+    end
+
+  private
+
+    def load_constant(name)
+      name = "#{self.scope.join('::')}::#{name}"
+      begin
+        const = name.constantize
+        self.modules << const
+      rescue NameError
+        puts "Unknown module #{name}."
+      end
     end
   end
 end

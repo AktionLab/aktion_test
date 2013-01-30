@@ -11,7 +11,7 @@ describe AktionTest::SpecHelper do
 
   describe '#within' do
     it 'allows a scope to be added' do
-      described_class.within :Test do
+      subject.within :Test do
         subject.scope.should == %w(AktionTest Module Test)
       end
       subject.scope.should == %w(AktionTest Module)
