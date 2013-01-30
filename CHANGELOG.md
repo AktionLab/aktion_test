@@ -1,3 +1,9 @@
+# v0.2.2
+  * More spec helper improvements
+  * Update factory girl to 4.2
+  * Mixin factory girl syntax to rspec
+  * Cleanup some tests
+
 # v0.2.1
   * Improve spec helper
   * Add FactoryGirl, Faker and Timecop
