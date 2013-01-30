@@ -8,20 +8,20 @@ module AktionTest
 
         class Matcher < Matchers::Base
           def initialize
-          end
-
-          def matches?(subject)
-            @subject = subject
-            file_exists? and file_is_not_a_directory?
+            super
           end
 
         protected
+          
+          def perform_match!
+            file_exists? and file_is_not_a_directory?
+          end
 
           def expectation
             "#{@subject} to be a file."
           end
 
-          def problem
+          def problems_for_should
             if File.exists?(@subject)
               if File.directory?(@subject)
                 "#{@subject} is a directory."
@@ -31,6 +31,9 @@ module AktionTest
             else
               "#{@subject} does not exist."
             end
+          end
+
+          def problems_for_should_not
           end
 
           def file_exists?
