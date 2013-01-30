@@ -1,3 +1,8 @@
+# v0.2.0
+  * Build out a better base matcher class
+  * Implement a SpecHelper loading interface
+  * Modularize components that can be loaded via SpecHelper
+
 # v0.1.2
   * Add a file contents matcher
 
