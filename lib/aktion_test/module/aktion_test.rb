@@ -7,7 +7,7 @@ module AktionTest
         require 'aktion_test/matchers/base'
 
         ::RSpec.configure do |config|
-          config.include ClassBuilder
+          config.include Support::ClassBuilder
           config.include Matchers::FileSystem::DirectoryExistance
           config.include Matchers::FileSystem::FileExistance
           config.include Matchers::FileSystem::DirectoryContains

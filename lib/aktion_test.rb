@@ -6,7 +6,6 @@ module AktionTest
   extend ActiveSupport::Autoload
 
   autoload :SpecHelper
-  autoload :ClassBuilder
 
   module Module
     extend ActiveSupport::Autoload
@@ -25,5 +24,11 @@ module AktionTest
       autoload :FileContains
       autoload :FileExistance
     end
+  end
+
+  module Support
+    extend ActiveSupport::Autoload
+
+    autoload :ClassBuilder
   end
 end

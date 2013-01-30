@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe AktionTest::ClassBuilder do
+describe AktionTest::Support::ClassBuilder do
   it "creates a new class" do
     clazz = define_class('Foo')
     clazz.new.should be_a Foo
