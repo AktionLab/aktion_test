@@ -19,24 +19,16 @@ describe AktionTest::SpecHelper do
   end
 
   describe '#load' do
-    before do
+    it 'initializes the module, adds it to a set of loaded modules, and saves any options' do
       subject.scope.pop(2)
       subject.scope << 'Baz'
-    end
 
-    it 'initializes the module' do
-      Baz.autoload?(:Bar).should == 'support/test_module'
-      described_class.load :Bar
-      Baz.autoload?(:Bar).should be_nil
-    end
+      Baz.autoload?(:Bar).should_not be_nil
 
-    it 'adds the module to a set of loaded modules' do
-      described_class.load :Bar
-      subject.modules.should == [Baz::Bar]
-    end
-
-    it 'saves options for the module loaded' do
       described_class.load :Bar, :test => :option
+
+      subject.modules.should == [Baz::Bar]
+      Baz.autoload?(:Bar).should be_nil
       subject.options.should have_key(:Bar)
       subject.options[:Bar].should == {:test => :option}
     end
