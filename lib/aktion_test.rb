@@ -11,8 +11,11 @@ module AktionTest
     extend ActiveSupport::Autoload
 
     autoload :AktionTest
+    autoload :FactoryGirl
+    autoload :Faker
     autoload :RSpec, 'aktion_test/module/rspec'
     autoload :Simplecov
+    autoload :Timecop
   end
 
   module Matchers

@@ -1,4 +1,4 @@
-module Aktion
+module AktionTest
   module Module
     module Timecop
       extend ActiveSupport::Concern
