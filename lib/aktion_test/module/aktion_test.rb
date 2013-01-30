@@ -5,11 +5,6 @@ module AktionTest
       
       included do |spec_helper|
         require 'aktion_test/matchers/base'
-        require 'aktion_test/class_builder'
-        require 'aktion_test/matchers/file_system/file_existance'
-        require 'aktion_test/matchers/file_system/directory_existance'
-        require 'aktion_test/matchers/file_system/directory_contains'
-        require 'aktion_test/matchers/file_system/file_contains'
 
         ::RSpec.configure do |config|
           config.include ClassBuilder
