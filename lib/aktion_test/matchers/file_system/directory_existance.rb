@@ -25,8 +25,6 @@ module AktionTest
             if File.exists? @subject
               unless File.directory? @subject
                 "#{@subject} is not a directory."
-              else
-                "Unknown"
               end
             else
               "#{@subject} does not exist."

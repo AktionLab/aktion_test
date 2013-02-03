@@ -66,8 +66,6 @@ module AktionTest
               end
               if missing_files.any?
                 missing_files.map{|f| "#{f} was not found"}.join("\n")
-              else
-                "Unknown Problem"
               end
             end
           end
