@@ -3,7 +3,6 @@ module AktionTest
     class AktionTest < Base
       def initialize(spec, options={})
         super
-        spec.use :Simplecov
       end
 
       def prepare
