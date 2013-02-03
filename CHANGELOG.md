@@ -1,3 +1,6 @@
+# v0.3.1
+  * Remove simplecov dep from AktionTest module and load it manually for ourselves
+
 # v0.3.0
   * New spec helper interface, more OOPish this time
   * Modules receive the spec helper instance in their initialize to load dependencies
