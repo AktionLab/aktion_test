@@ -2,13 +2,27 @@ require 'spec_helper'
 
 describe AktionTest::Matchers::Base do
   before :each do
-    matcher_class = define_class('Matcher', described_class) do
-      def expectation;         "an expectation";               end
-      def problems_for_should; "\na problem\nanother problem"; end
+    define_class('Matcher', described_class) do
+      def expectation;             "an expectation";               end
+      def problems_for_should;     "\na problem\nanother problem"; end
       def problems_for_should_not; "\na problem\nanother problem"; end
     end
 
-    @matcher = matcher_class.new
+    define_class 'EmptyMatcher', described_class
+
+    @matcher = Matcher.new
+  end
+
+  it 'provides a warning that the expectation has not been set' do
+    matcher = EmptyMatcher.new
+    matcher.stub(:perform_match! => false)
+    matcher.matches? nil
+    matcher.failure_message.should =~ /Override expectation to provide expectation details/
+  end
+
+  it 'raises an error if perform_match! is not overriden' do
+    matcher = EmptyMatcher.new
+    expect { matcher.matches? nil }.to raise_error(/Override perform_match!/)
   end
     
   describe '#failure_message' do
@@ -32,6 +46,13 @@ describe AktionTest::Matchers::Base do
       @matcher.matches? nil
       expect { @matcher.failure_message }.to raise_error(RuntimeError, /failure message while/)
     end
+
+    it 'provides a warning the failure message has not been set' do
+      matcher = EmptyMatcher.new
+      matcher.stub(:perform_match! => false)
+      matcher.matches? nil
+      matcher.failure_message.should =~ /Override problem_for_should /
+    end
   end
 
   describe '#negative_failure_message' do
@@ -54,6 +75,13 @@ describe AktionTest::Matchers::Base do
       @matcher.stub(:perform_match! => false)
       @matcher.matches? nil
       expect { @matcher.negative_failure_message }.to raise_error(RuntimeError, /negative failure message while/)
+    end
+
+    it 'provides a warning the failure message has not been set' do
+      matcher = EmptyMatcher.new
+      matcher.stub(:perform_match! => true)
+      matcher.matches? nil
+      matcher.negative_failure_message.should =~ /Override problem_for_should_not/
     end
   end
 end
