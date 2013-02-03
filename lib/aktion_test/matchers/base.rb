@@ -12,15 +12,11 @@ module AktionTest
       end
 
       def failure_message
-        raise "Called failure message before determining a match from #{caller[0]}" if @matches.nil?
-        raise "Called failure message while the match was positive from #{caller[0]}" if @matches
-        "Expected #{expectation}\n#{problems_for_should}\n"
+        message(false)
       end
 
       def negative_failure_message
-        raise "Called negative failure message before determining a match from #{caller[0]}" if @matches.nil?
-        raise "Called negative failure message while the match was unsucessful from #{caller[0]}" unless @matches
-        "Did not expect #{expectation}\n#{problems_for_should_not}\n"
+        message(true)
       end
 
     protected
@@ -39,6 +35,19 @@ module AktionTest
 
       def perform_match!
         raise "Override perform_match! with your custom matching logic. The subject is available through @subject"
+      end
+
+    private
+      
+      def message(match)
+        check_match(match)
+        "#{match ? 'Did not expect' : 'Expected'} #{expectation}\n#{send(match ? :problems_for_should_not : :problems_for_should)}\n"
+      end
+
+      def check_match(match)
+        method = match ? 'negative failure message' : 'failure message'
+        raise "Called #{method} before determining a match from #{caller[0]} " if @matches.nil?
+        raise "Called #{method} while the match was #{match ? 'negative' : 'positive'} from #{caller[0]}" unless @matches == match
       end
     end
   end
