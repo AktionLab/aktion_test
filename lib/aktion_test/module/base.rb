@@ -1,12 +1,6 @@
 module AktionTest
   module Module
     class Base
-      class << self
-      protected
-        def depends_on(klass)
-        end
-      end
-
       def initialize(spec, options={})
         @options, @spec = options, spec
         @rspec = ::RSpec.configuration
