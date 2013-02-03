@@ -1,5 +1,6 @@
 # AktionTest
 
+[![Code Climate](https://codeclimate.com/github/AktionLab/aktion_test.png)](https://codeclimate.com/github/AktionLab/aktion_test)
 [![Build Status](https://secure.travis-ci.org/AktionLab/aktion_test.png?branch=master)](https://travis-ci.org/AktionLab/aktion_test)
 [![Dependency Status](https://gemnasium.com/AktionLab/aktion_test.png)](https://gemnasium.com/AktionLab/aktion_test)
 
