@@ -10,7 +10,7 @@ describe AktionTest::Matchers::Base do
 
     define_class 'EmptyMatcher', described_class
 
-    @matcher = Matcher.new
+    @matcher = ::Matcher.new
   end
 
   it 'provides a warning that the expectation has not been set' do
