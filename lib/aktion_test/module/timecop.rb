@@ -1,10 +1,12 @@
 module AktionTest
   module Module
-    module Timecop
-      extend ActiveSupport::Concern
-
-      included do |spec_helper|
+    class Timecop < Base
+      def prepare
         require 'timecop'
+      end
+
+      def configure
+        rspec.after { ::Timecop.return }
       end
     end
   end

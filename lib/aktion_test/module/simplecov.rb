@@ -1,8 +1,11 @@
 module AktionTest
   module Module
-    module Simplecov
-      require 'simplecov'
-      ::SimpleCov.start
+    class Simplecov < Base
+      def initialize(spec, options={})
+        super
+        require 'simplecov'
+        ::SimpleCov.start
+      end
     end
   end
 end

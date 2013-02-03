@@ -1,9 +1,7 @@
 module AktionTest
   module Module
-    module Faker
-      extend ActiveSupport::Concern
-      
-      included do |spec_helper|
+    class Faker < Base
+      def prepare
         require 'faker'
       end
     end

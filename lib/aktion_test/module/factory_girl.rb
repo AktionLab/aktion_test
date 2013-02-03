@@ -1,14 +1,12 @@
 module AktionTest
   module Module
-    module FactoryGirl
-      extend ActiveSupport::Concern
-      
-      included do |spec_helper|
+    class FactoryGirl < Base
+      def prepare
         require 'factory_girl'
+      end
 
-        ::RSpec.configure do |config|
-          config.include ::FactoryGirl::Syntax::Methods
-        end
+      def configure
+        rspec.include ::FactoryGirl::Syntax::Methods
       end
     end
   end

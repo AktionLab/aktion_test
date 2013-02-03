@@ -2,4 +2,7 @@ $: << File.dirname(__FILE__)
 require 'aktion_test'
 require 'support/autoload'
 
-AktionTest::SpecHelper.load :Simplecov, :RSpec, :AktionTest, :Timecop, :FactoryGirl, :Faker
+AktionTest::SpecHelper.build do
+  use :Simplecov
+  use :AktionTest, :FactoryGirl, :Faker, :RSpec, :Timecop
+end

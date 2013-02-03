@@ -9,11 +9,11 @@ module AktionTest
         end
       end
 
-      def define_class(class_name, base = Object, &block)
+      def define_class(class_name, base = Object, scope = Object, &block)
         class_name = class_name.to_s.camelize
 
         Class.new(base).tap do |constant_class|
-          Object.const_set(class_name, constant_class)
+          scope.const_set(class_name, constant_class)
           constant_class.unloadable
           constant_class.class_eval(&block) if block_given?
           constant_class.reset_column_information if constant_class.respond_to? :reset_column_information

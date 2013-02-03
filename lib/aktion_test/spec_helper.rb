@@ -1,27 +1,18 @@
-require 'singleton'
+require 'aktion_test/module/base'
 
 module AktionTest
   class SpecHelper
-    include Singleton
-
-    attr_reader :modules, :options, :scope
+    attr_reader :modules, :options
+    attr_writer :scope
 
     class << self
-      def load(*names, &block)
-        if names.any?
-          instance.load(*names)
+      def build(&block)
+        new.tap do |sh|
+          if block_given?
+            sh.instance_eval(&block)
+            sh.compile!
+          end
         end
-
-        instance.instance_eval(&block) if block_given?
-
-        instance.modules.each{|mod| include mod}
-      end
-
-      def add_module(name, options={})
-      end
-
-      def add_modules(*names)
-        names.each{|name| add_module(name)}
       end
     end
 
@@ -31,41 +22,44 @@ module AktionTest
 
     def reset
       @modules = []
-      @options = {}
       @scope   = %w(AktionTest Module)
     end
 
-    def loaded?(name)
-      eval "defined? AktionTest::Module::#{name}"
-    end
-
-    def load(*names)
+    def use(*names)
       options = names.extract_options!
+      return names.each {|name| use name} if names.many?
 
-      names.each do |name|
-        unless options.nil? or options.empty?
-          self.options.merge! name => options
-        end
-        load_constant(name)
+      name = names.first
+
+      klass = case name
+      when Class then name
+      when /^::/ then name.constantize
+      else "#{@scope.join('::')}::#{name}".constantize
       end
+
+      unless klass.ancestors.include? AktionTest::Module::Base
+        raise ArgumentError.new("#{klass.name} must inherit from AktionTest::Module::Base") 
+      end
+
+      modules << klass.new(self, options)
     end
 
-    def within(scope, &block)
-      self.scope << scope.to_s
-      yield
-      self.scope.pop
-    end
+    def scope(name='')
+      return @scope if name.blank?
+      raise ArgumentError.new("A block is required when applying a temporary scope") unless block_given?
 
-  private
-
-    def load_constant(name)
-      name = "#{self.scope.join('::')}::#{name}"
       begin
-        const = name.constantize
-        self.modules << const
-      rescue NameError
-        puts "Unknown module #{name}."
+        scope << name
+        yield
+      ensure
+        scope.pop
       end
+    end
+
+    def compile!
+      modules.each &:prepare
+      modules.each &:configure
+      modules.each &:cleanup
     end
   end
 end

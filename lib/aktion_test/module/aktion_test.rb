@@ -1,18 +1,20 @@
 module AktionTest
   module Module
-    module AktionTest
-      extend ActiveSupport::Concern
-      
-      included do |spec_helper|
-        require 'aktion_test/matchers/base'
+    class AktionTest < Base
+      def initialize(spec, options={})
+        super
+      end
 
-        ::RSpec.configure do |config|
-          config.include Support::ClassBuilder
-          config.include Matchers::FileSystem::DirectoryExistance
-          config.include Matchers::FileSystem::FileExistance
-          config.include Matchers::FileSystem::DirectoryContains
-          config.include Matchers::FileSystem::FileContains
-        end
+      def prepare
+        require 'aktion_test/matchers/base'
+      end
+
+      def configure
+        rspec.include Support::ClassBuilder
+        rspec.include Matchers::FileSystem::DirectoryExistance
+        rspec.include Matchers::FileSystem::FileExistance
+        rspec.include Matchers::FileSystem::DirectoryContains
+        rspec.include Matchers::FileSystem::FileContains
       end
     end
   end
