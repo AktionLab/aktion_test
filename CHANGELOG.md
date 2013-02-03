@@ -1,3 +1,9 @@
+# v0.3.0
+  * New spec helper interface, more OOPish this time
+  * Modules receive the spec helper instance in their initialize to load dependencies
+  * Improve coverage
+  * AktionLab module now loads SimpleCov as it initializes
+
 # v0.2.2
   * More spec helper improvements
   * Update factory girl to 4.2
